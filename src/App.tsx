@@ -1,13 +1,16 @@
 /* global chrome */
-import './App.css';
-import React, { useState } from 'react';
-import tabData from './data/tabExample';
+import React, { useState, useEffect } from 'react';
+
+import { Category } from './common/types';
+import categoryExample from './data/categoryExample';
+import CategoryEntry from './components/Category';
 
 function App() {
-  const [tabInfo, setTabInfo] = useState<chrome.tabs.Tab[]>(tabData);
-  // const [tabInfo, setTabInfo] = useState<Array<JSX.Element>>([]);
+  const [categoryInfo, setCategoryInfo] = useState<Category[]>([]);
 
-  console.log('App running - to make index.html');
+  useEffect(() => {
+    // fetch() // GET /category
+  }, []);
 
   // // Only works on extensions
   // chrome.tabs.query(
@@ -22,12 +25,16 @@ function App() {
 
   return (
     <>
-      <ul>
-        {tabInfo.map((tab) => {
-          return <li>{JSON.stringify(tab)}</li>;
-        })}
-      </ul>
-      <div className="App">Hello React</div>
+      {categoryExample.map((cat, idx) => {
+        return (
+          <CategoryEntry
+            key={cat.id}
+            id={cat.id}
+            name={cat.name}
+            tabs={cat.tabs}
+          />
+        );
+      })}
     </>
   );
 }
