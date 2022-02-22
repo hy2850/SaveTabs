@@ -18,6 +18,8 @@ interface TabProps {
   favIconUrl: string | undefined;
 }
 
+const a = 1;
+
 function Tab({ id, index, favIconUrl = '', title, url }: TabProps) {
   return (
     <Draggable draggableId={id!} index={index}>

@@ -1,0 +1,33 @@
+// ref - https://github.com/einride/tsconfig
+{
+    "compilerOptions": {
+      // type checking
+      "exactOptionalPropertyTypes": true,
+      "noFallthroughCasesInSwitch": true,
+      "strict": true,
+  
+      // modules
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "resolveJsonModule": true,
+  
+      // emit
+      "noEmit": true,
+  
+      // javascript support
+      "allowJs": false,
+  
+      // interop constraints
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true, // default true when esModuleInterop is true
+      "forceConsistentCasingInFileNames": true,
+      "isolatedModules": true,
+  
+      // landguage and environment
+      "lib": ["esnext", "dom", "dom.iterable"],
+      "target": "es5",
+  
+      // completeness
+      "skipLibCheck": true
+    }
+  }
