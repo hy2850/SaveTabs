@@ -11,6 +11,8 @@ https://stackoverflow.com/questions/36261225/why-is-export-default-const-invalid
 
 Q. client/server 코드를 초기에 분리해야 할까? ESLint + Prettier setting을 root에 두고, 필요한 package는 FE/BE에 따라 달라지니까
 
+
+
 <br>
 
 ### 12Feb22
@@ -122,6 +124,8 @@ spreading - esLint rule disable
 
 droppableId, draggableId, index 처럼 id, index 중요
 
+
+
 <br>
 
 ### 13Feb22
@@ -145,6 +149,8 @@ onDragEnd 함수 result 인자 - 영상 참고 https://egghead.io/lessons/react-
 re-ordering - 데이터 구조가 좀 특이한데? taskId?
 
 [예시](https://codesandbox.io/s/mmrp44okvj?file=/index.js:380-387) 보니까, Array에 담긴 element 순서만 바꿔주면 되는 것 같은데.
+
+
 
 <br>
 
@@ -199,9 +205,95 @@ console.log(categories) // 바뀌어있음!
 
    https://stackoverflow.com/questions/39818429/how-do-you-import-type-definitions-from-types-typescript-2-0
 
+
+
 <br>
 
 ### 21Feb22 월
 
 Re-ordering 설계에 따른 DB model 고민 (갤럭시탭 삼성노트)
 → Array 지원되는 mongoDB 써보자. N:M 간단하니까 reference 기능으로 충분할 듯
+
+[Sequelize Array - only for PostgreSQL](https://sequelize.org/v5/manual/data-types.html)
+[mongoose Array](https://mongoosejs.com/docs/schematypes.html#arrays)
+
+mongoose에 relation 개념 없음 → mongoDB가 NoSQL이기 때문
+
+- (추천⭐️) http://learnmongodbthehardway.com/schema/schemabasics/#many-to-many-n-m
+- https://docs.mongodb.com/manual/tutorial/model-referenced-one-to-many-relationships-between-documents/
+
+1. Category-Tab = 1:N
+Tab 엄청 많음 → ref 활용한 Linking
+2. Category-Tag = N:M
+둘 다 수는 비등비등 → Two way embedding
+
+
+
+<br>
+
+### 22Feb22 화
+
+실제로 mongoose로는 어떻게 구현?
+👉🏻 [⭐️ Many-to-many with mongoose, 2 main approaches + $lookup joins using virtual](https://stackoverflow.com/questions/46019149/many-to-many-with-mongoose)
+
+1. Array of references (Update 시 양쪽 모두 manual로 업데이트 해줘야)
+2. (Classic approach) Intermediary table
+2. 
+
+Q. aggregation = join collections on server?
+https://docs.mongodb.com/manual/aggregation/
+
+
+
+(Embedding 방법) 아니면 tag ObjectId 말고 tag name만 저장할까
+그래도 여전히 tag로 category 검색, category에 달린 tag 검색 모두 가능
+👉🏻 [Many-to-many with small number of instances : use embedding](https://stackoverflow.com/questions/2336700/mongodb-many-to-many-association)
+
+OK! tag collection 따로 필요 없을 듯. category collection에 tag : String[]로도 충분할 듯.
+
+
+
+Schema-less NoSQL 장점 - allows flexible design; 상황에 맞게, 자유롭게 내가 원하는 대로 설계 가능
+RDBMS에선 Many-to-many relation으로 강제됐을 사항을 여기선 embedding으로 처리할 수도 있고
+
+Q. mongoose.Schema.Types VS mongoose.Types
+Typescript interface로 Schema typing 할때 생긴 궁금증
+A. 전자는 Schema 정의할 때 type 지정 시 쓰임. 후자는 이외의 경우에 mongoose type 활용할 일 있을 때 사용.
+https://github.com/Automattic/mongoose/issues/1671
+
+Q. Mongoose의 ref, subdocument array (ex. categoryOrder의 type:[categorySchema]) 등이 mongoDB에선 실제로 어떤 식으로 저장되는지 궁금
+
+
+
+```
+db.categories.insertOne({name:"Typescript", tags:["language", "fun"]})
+db.categories.insertOne({name:"Java", tags:["language"]})
+
+db.tabs.insertMany([
+   { categoryId: ObjectId("6214dd764898449450aaaf43"), title: "TS docs", url: "www.typescriptlang.org", favIconUrl: "", createdAt: new Date() },
+   { categoryId: ObjectId("6214dd764898449450aaaf43"), title: "TS stackoverflow", url: "https://stackoverflow.com", favIconUrl: "https://stackoverflow.com/favicon.ico", createdAt: new Date() },
+   { categoryId: ObjectId("6214dd864898449450aaaf44"), title: "Java docs", url: "https://https://www.java.com/ko/", favIconUrl: "https://java.com/favicon.ico", createdAt: new Date() },
+])
+
+db.tabs.deleteMany({})
+```
+
+
+
+#### Flow
+client (fetch, get query, put json) → server (router, REST API, use mongoose model to fetch) → DB 
+
+populate는 ref를 해당 document로 replace해버리는 기능.
+현재 내 Tab model의 경우엔 ref는 필요 없을 듯
+
+
+
+// routes try~catch로 감싸기
+// CRUD?
+// 일단 Front에서 데이터 받아서 잘 적용 되는지 체크하고 나머지 CRUD
+
+
+
+<br>
+
+### 23Feb22 수

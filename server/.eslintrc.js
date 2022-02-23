@@ -13,7 +13,9 @@ module.exports = {
       "plugin:prettier/recommended",
       "prettier"
     ],
-    rules: {},
+    rules: {
+      "no-underscore-dangle": "off"
+    },
     settings: {},
     env: {
       es2021: true,

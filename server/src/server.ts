@@ -4,13 +4,17 @@ import morgan from 'morgan';
 import path from 'path';
 import dotenv from 'dotenv';
 
+import { mongoDBConnect } from './schemas';
+
 // Routers
-import indexRouter from './routes/index';
+import indexRouter from './routes/indexRoute';
+import categoryRouter from './routes/categoryRoute';
 
 dotenv.config();
 
 const app = express();
 app.set('port', process.env.PORT || 8001);
+mongoDBConnect();
 
 // Middlewares
 app.use(morgan('dev'));
@@ -19,6 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+app.use('/category', categoryRouter);
 app.use('/', indexRouter);
 
 app.use((req, res, next) => {
