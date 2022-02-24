@@ -6,7 +6,7 @@ const {
 
 export interface TabOrder {
   categoryId: Types.ObjectId;
-  order: Types.ObjectId[];
+  order?: Types.ObjectId[];
 }
 
 const tabOrderSchema = new Schema<TabOrder>({

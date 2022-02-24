@@ -1,5 +1,5 @@
 import express, { ErrorRequestHandler } from 'express';
-// import cors from 'cors';
+import cors from 'cors';
 import morgan from 'morgan';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -18,7 +18,12 @@ mongoDBConnect();
 
 // Middlewares
 app.use(morgan('dev'));
-// app.use(cors());
+app.use(
+  cors({
+    origin: ['http://localhost:3000'],
+    credentials: true,
+  }),
+);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

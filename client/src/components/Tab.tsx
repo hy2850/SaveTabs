@@ -1,7 +1,8 @@
 import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
-
 import styled from 'styled-components';
+
+import { Tab as TabType } from '../common/types';
 
 const TabBox = styled.div`
   border: solid 1px black;
@@ -10,19 +11,15 @@ const TabBox = styled.div`
   background-color: white;
 `;
 
-interface TabProps {
-  index: number;
-  id: string | undefined;
-  title: string | undefined;
-  url: string | undefined;
-  favIconUrl: string | undefined;
-}
-
-const a = 1;
-
-function Tab({ id, index, favIconUrl = '', title, url }: TabProps) {
+export function Tab({
+  _id,
+  index,
+  favIconUrl = '',
+  title,
+  url,
+}: TabType & { index: number }) {
   return (
-    <Draggable draggableId={id!} index={index}>
+    <Draggable draggableId={_id} index={index}>
       {(provided) => (
         <TabBox
           ref={provided.innerRef}
@@ -39,4 +36,4 @@ function Tab({ id, index, favIconUrl = '', title, url }: TabProps) {
   );
 }
 
-export default Tab;
+// export default Tab;

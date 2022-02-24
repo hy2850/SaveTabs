@@ -43,16 +43,34 @@ router.get('/:catid', async (req, res, next) => {
   }
 });
 
-router.get('/:catid/order', async (req, res, next) => {
-  try {
-    const tabOrder: TabOrder | null = await tabOrderModel.findOne({
-      categoryId: req.params.catid,
-    });
-    res.status(200).json(tabOrder?.order);
-  } catch (error) {
-    console.error(error);
-    next(error);
-  }
-});
+router
+  .route('/:catid/order')
+  .get(async (req, res, next) => {
+    try {
+      const tabOrder: TabOrder | null = await tabOrderModel.findOne({
+        categoryId: req.params.catid,
+      });
+      res.status(200).json(tabOrder?.order);
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  })
+  .put(async (req, res, next) => {
+    try {
+      const updateRes = await tabOrderModel.updateOne(
+        {
+          categoryId: req.params.catid,
+        },
+        {
+          order: req.body,
+        },
+      );
+      res.status(200).send(updateRes.acknowledged);
+    } catch (error) {
+      console.error(error);
+      next(error);
+    }
+  });
 
 export default router;

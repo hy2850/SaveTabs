@@ -47,3 +47,10 @@ tab[]
 Get tab order array of category '_id : catid'
 
 ObjectId[]
+
+<br>
+### PUT /category/:catid/order
+Change tab order array of category '_id : catid'
+
+ObjectId[]
+changed order

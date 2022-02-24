@@ -2,8 +2,12 @@ import React from 'react';
 import styled from 'styled-components';
 import { Droppable } from 'react-beautiful-dnd';
 
-import { Category as CategoryProps } from '../common/types';
-import TabEntry from './Tab';
+import {
+  Category as CategoryType,
+  Tab as TabType,
+  CategoryWithTabs as CategoryProps,
+} from '../common/types';
+import { Tab } from './Tab';
 
 const CategoryBox = styled.div`
   border: solid 3px red;
@@ -15,21 +19,23 @@ const Header = styled.h1`
   margin: 10px;
 `;
 
-function Category({ id, name, tabs }: CategoryProps) {
+export function Category({ _id, name, tabs }: CategoryProps) {
   return (
     <CategoryBox>
-      <Droppable droppableId={id}>
+      <Header>{name}</Header>
+      <Droppable droppableId={_id}>
         {(provided) => (
           <TabList ref={provided.innerRef} {...provided.droppableProps}>
             {tabs.map((tab, idx) => {
               return (
-                <TabEntry
-                  key={tab.id}
-                  id={tab.id?.toString()}
+                <Tab
+                  key={tab._id}
+                  index={idx}
+                  _id={tab._id}
                   favIconUrl={tab.favIconUrl}
                   title={tab.title}
                   url={tab.url}
-                  index={idx}
+                  createdAt={tab.createdAt}
                 />
               );
             })}
@@ -41,4 +47,4 @@ function Category({ id, name, tabs }: CategoryProps) {
   );
 }
 
-export default Category;
+// export default Category;

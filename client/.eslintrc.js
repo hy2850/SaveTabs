@@ -18,10 +18,12 @@ module.exports = {
     'prettier',
   ],
   rules: {
-    'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': 'off',
-    'react/jsx-props-no-spreading': 'off',
-    'react/require-default-props': 'off', // https://stackoverflow.com/questions/69687167/proptype-name-is-not-required-but-has-no-corresponding-defaultprops-declarati
+    'no-unused-vars': 'off', 
+    '@typescript-eslint/no-unused-vars': 'off', // dev interruption
+    'react/jsx-props-no-spreading': ['warn'], // react-dnd
+    'react/require-default-props': 'off', // Bug with deprecated feature - https://stackoverflow.com/questions/69687167/proptype-name-is-not-required-but-has-no-corresponding-defaultprops-declarati
+    'no-underscore-dangle': 'off', // _id in mongoose models
+    'import/prefer-default-export': 'off' // no default exports
   },
   settings: {},
   env: {

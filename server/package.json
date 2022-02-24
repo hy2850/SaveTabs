@@ -10,6 +10,7 @@
   "author": "ParkHC",
   "license": "MIT",
   "devDependencies": {
+    "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
     "@types/morgan": "^1.9.3",
     "@typescript-eslint/eslint-plugin": "^5.12.1",
