@@ -41,17 +41,20 @@ export async function updateTabOrder(
       `${process.env.REACT_APP_SERVER_URL}/category/${src.droppableId}/order`,
       srcCatTabOrder,
     );
+
+    // Change 'categoryId' of Tab model to new destination category
+    // @TODO
   }
   return true;
 }
 
 export function orderArrById(arr: any[], idArr: string[]): any[] {
   // const orderedArr = Array(arr.length); // dummy
-
+  console.log('helper : ', arr, idArr);
   return idArr.map((id, idx) => {
-    const elem = arr.find(({ _id }) => {
+    return arr.find(({ _id }) => {
       return _id === idArr[idx];
     });
-    return arr[idx];
+    // @TODO undefined 에러 처리
   });
 }

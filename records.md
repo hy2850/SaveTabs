@@ -1,3 +1,5 @@
+## Week 2 - 7Jan22 ~ 13Feb22
+
 ### 8Feb22
 
 - export default + variable definition 안됨
@@ -154,6 +156,8 @@ re-ordering - 데이터 구조가 좀 특이한데? taskId?
 
 <br>
 
+## Week 3 - 14Feb22 ~ 20Feb22
+
 ### 14Feb22
 
 - re-order persisting 구현
@@ -209,6 +213,8 @@ console.log(categories) // 바뀌어있음!
 
 <br>
 
+## Week 4 - 21Feb22 ~ 27Feb22
+
 ### 21Feb22 월
 
 Re-ordering 설계에 따른 DB model 고민 (갤럭시탭 삼성노트)
@@ -261,22 +267,7 @@ Typescript interface로 Schema typing 할때 생긴 궁금증
 A. 전자는 Schema 정의할 때 type 지정 시 쓰임. 후자는 이외의 경우에 mongoose type 활용할 일 있을 때 사용.
 https://github.com/Automattic/mongoose/issues/1671
 
-Q. Mongoose의 ref, subdocument array (ex. categoryOrder의 type:[categorySchema]) 등이 mongoDB에선 실제로 어떤 식으로 저장되는지 궁금
-
-
-
-```
-db.categories.insertOne({name:"Typescript", tags:["language", "fun"]})
-db.categories.insertOne({name:"Java", tags:["language"]})
-
-db.tabs.insertMany([
-   { categoryId: ObjectId("6214dd764898449450aaaf43"), title: "TS docs", url: "www.typescriptlang.org", favIconUrl: "", createdAt: new Date() },
-   { categoryId: ObjectId("6214dd764898449450aaaf43"), title: "TS stackoverflow", url: "https://stackoverflow.com", favIconUrl: "https://stackoverflow.com/favicon.ico", createdAt: new Date() },
-   { categoryId: ObjectId("6214dd864898449450aaaf44"), title: "Java docs", url: "https://https://www.java.com/ko/", favIconUrl: "https://java.com/favicon.ico", createdAt: new Date() },
-])
-
-db.tabs.deleteMany({})
-```
+#### 🤔 Q. Mongoose의 ref, subdocument array (ex. categoryOrder의 type:[categorySchema]) 등이 mongoDB에선 실제로 어떤 식으로 저장되는지 궁금
 
 
 
@@ -297,3 +288,122 @@ populate는 ref를 해당 document로 replace해버리는 기능.
 <br>
 
 ### 23Feb22 수
+
+DB model interface는 client와 server 모두에서 사용 가능할 수 있게 해야할 것 같은데.
+→ shared path 만들어보기 (https://stackoverflow.com/questions/37579969/how-to-use-multiple-tsconfig-files-in-vs-code)
+
+
+
+async fetch → loading spinner 도입 검토
+
+https://github.com/danilowoz/react-content-loader
+https://www.npmtrends.com/react-content-loader-vs-react-loading-skeleton-vs-react-placeholder-vs-react-skeleton-css-vs-react-skeleton-loader-vs-vue-content-loader
+
+
+
+fetch doesn't throw error even for HTTP code 400 → use Axios (axios의 장점 찾았다!) (참고 : NodeJS 교과서 10.4)
+
+
+
+React fetch data pattern → html project / diary.md 오늘 날짜 링크 찾아보기
+
+
+shared 폴더 만들어서 client, server가 DB model type share하려고 했는데, Mongoose.Types.ObjectId[] 같은 Type은 서버쪽에서만 쓰이고 client에선 string[]으로 쓰일거라 inconsistency 존재.
+→ 그냥 client에선 src/common/types.ts에 저장
+
+client 최상단 App.tsx에서 category + tab 데이터 모두 불러오고, 하위 Category.tsx, Tab.tsx는 controlled component로 쓰는게 좋을까?
+
+
+
+<br>
+
+### 24Feb22 목
+
+버그, 문제) fetch 내용이 화면에 안뜸. 
+
+원인) Array.map 내부의 async 실행 이전에 setState가 실행돼서.
+
+```Typescript
+const res: CategoryWithTabs[] = [];
+categoryList.map(async (cat) => {
+  fetchResult = await axios.get(
+    `${process.env.REACT_APP_SERVER_URL}/category/${cat._id}`,
+  );
+  const tabList: TabType[] = fetchResult.data;
+  res.push({ ...cat, tabs: tabList });
+});
+
+console.log('set category info :', res); // 🔥 [] (empty array here because callback of 'Array.map' is async)
+setCategoryInfo(res);
+```
+
+해결) Array.map은 Promise list 반환하게 하고, `Promise.all`로 한꺼번에 resolve
+
+```Typescript
+const promiseList = categoryList.map((cat) => {
+  return axios.get(
+    `${process.env.REACT_APP_SERVER_URL}/category/${cat._id}`,
+  );
+});
+
+const tabFetchResults = await Promise.all(promiseList);
+const res: CategoryWithTabs[] = tabFetchResults.map((fetchRes, idx) => {
+  return { ...categoryList[idx], tabs: fetchRes.data };
+});
+setCategoryInfo(res);
+```
+
+참고) https://stackoverflow.com/questions/40140149/use-async-await-with-array-map
+
+
+
+Update tab order 
+
+1. Reflect local array
+2. Update order info in DB (separate this logic into a hook?)
+
+2->1 순서로 하니까 UX 너무 느리네. 1 해두고 2는 async로 천천히 하는게 좋을 듯 (🔥 possible bug? 사용자가 마구마구 order 바꾸는 경우?)
+
+
+
+data fetch, update order in same category 까지 작업
+
+
+
+저녁에 Java LC 공부
+
+
+
+
+
+
+
+Dummy data mongoDB manual insertion
+
+category and tabs
+
+db.categories.insertOne({name:"Typescript", tags:["language", "fun"]})
+db.categories.insertOne({name:"Java", tags:["language"]})
+
+db.tabs.insertMany([
+   { categoryId: ObjectId("6214dd764898449450aaaf43"), title: "TS docs", url: "www.typescriptlang.org", favIconUrl: "", createdAt: new Date() },
+   { categoryId: ObjectId("6214dd764898449450aaaf43"), title: "TS stackoverflow", url: "https://stackoverflow.com", favIconUrl: "https://stackoverflow.com/favicon.ico", createdAt: new Date() },
+   { categoryId: ObjectId("6214dd864898449450aaaf44"), title: "Java docs", url: "https://https://www.java.com/ko/", favIconUrl: "https://java.com/favicon.ico", createdAt: new Date() },
+])
+
+db.tabs.deleteMany({})
+
+
+
+Order
+
+db.taborders.deleteMany({})
+
+db.taborders.insertOne({ categoryId: ObjectId("6214dd764898449450aaaf43"), order: [ ObjectId("6214e1a54898449450aaaf48"), ObjectId("6214e1a54898449450aaaf49") ] });
+
+db.taborders.insertOne({ categoryId: ObjectId("6214dd864898449450aaaf44"), order: [ ObjectId("6214e1a54898449450aaaf4a") ] });
+
+
+
+db.categoryorders.insertOne({ order: [ ObjectId("6214dd764898449450aaaf43"), ObjectId("6214dd864898449450aaaf44") ] });
+

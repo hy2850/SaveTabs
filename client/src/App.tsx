@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import axios from 'axios';
-import { updateTabOrder } from './common/helper';
+import { updateTabOrder, orderArrById } from './common/helper';
 
 import {
   Category as CategoryType,
@@ -23,20 +23,43 @@ function App() {
       const fetchResult = await axios.get(
         `${process.env.REACT_APP_SERVER_URL}/category`,
       );
-      const categoryList: CategoryType[] = fetchResult.data;
+      const unorderedCategoryList: CategoryType[] = fetchResult.data;
 
-      console.log('GET /category :', categoryList);
+      console.log('GET /category :', unorderedCategoryList);
 
-      const promiseList = categoryList.map((cat) => {
+      // const categoryList: CategoryType[] = Array(unorderedCategoryList.length);
+      const categoryList: CategoryType[] = unorderedCategoryList;
+
+      // GET /category/:catid/order
+      // @TODO
+
+      const tabsPromiseList = categoryList.map((cat) => {
         return axios.get(
           `${process.env.REACT_APP_SERVER_URL}/category/${cat._id}`,
         );
       });
-
-      const tabFetchResults = await Promise.all(promiseList);
-      const res: CategoryWithTabs[] = tabFetchResults.map((fetchRes, idx) => {
-        return { ...categoryList[idx], tabs: fetchRes.data };
+      const tabOrderPromiseList = categoryList.map((cat) => {
+        return axios.get(
+          `${process.env.REACT_APP_SERVER_URL}/category/${cat._id}/order`,
+        );
       });
+
+      const tabFetchResults = await Promise.all(tabsPromiseList);
+      const tabOrderFetchResults = await Promise.all(tabOrderPromiseList);
+
+      const res: CategoryWithTabs[] = [];
+      for (let idx = 0; idx < tabFetchResults.length; idx += 1) {
+        const orderedTabs = orderArrById(
+          tabFetchResults[idx].data,
+          tabOrderFetchResults[idx].data,
+        );
+        console.log(orderedTabs);
+        res.push({ ...categoryList[idx], tabs: orderedTabs });
+      }
+
+      // const res: CategoryWithTabs[] = tabFetchResults.map((fetchRes, idx) => {
+      //   return { ...categoryList[idx], tabs: fetchRes.data };
+      // });
 
       console.log('set category info :', res);
       setCategoryInfo(res);
